@@ -3,7 +3,7 @@ package registry
 import (
 	descriptorpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
 
-	"github.com/grpc-ecosystem/protoc-gen-grpc-gateway-ts/data"
+	"github.com/aflesher/protoc-gen-grpc-gateway-ts/data"
 )
 
 // getFieldType generates an intermediate type and leave the rendering logic to choose what to render
@@ -11,7 +11,8 @@ func (r *Registry) getFieldType(f *descriptorpb.FieldDescriptorProto) string {
 	typeName := ""
 	if f.Type != nil {
 		switch *f.Type {
-		case descriptorpb.FieldDescriptorProto_TYPE_MESSAGE, descriptorpb.FieldDescriptorProto_TYPE_ENUM:
+		case descriptorpb.FieldDescriptorProto_TYPE_MESSAGE,
+			descriptorpb.FieldDescriptorProto_TYPE_ENUM:
 			typeName = f.GetTypeName()
 		case descriptorpb.FieldDescriptorProto_TYPE_STRING:
 			typeName = "string"
@@ -49,7 +50,12 @@ func (r *Registry) getFieldType(f *descriptorpb.FieldDescriptorProto) string {
 	return typeName
 }
 
-func (r *Registry) analyseField(fileData *data.File, msgData *data.Message, packageName string, f *descriptorpb.FieldDescriptorProto) {
+func (r *Registry) analyseField(
+	fileData *data.File,
+	msgData *data.Message,
+	packageName string,
+	f *descriptorpb.FieldDescriptorProto,
+) {
 	fqTypeName := r.getFieldType(f)
 
 	isExternal := r.isExternalDependenciesOutsidePackage(fqTypeName, packageName)

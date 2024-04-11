@@ -3,13 +3,22 @@ package registry
 import (
 	descriptorpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
 
-	"github.com/grpc-ecosystem/protoc-gen-grpc-gateway-ts/data"
+	"github.com/aflesher/protoc-gen-grpc-gateway-ts/data"
 )
 
-func (r *Registry) analyseMessage(fileData *data.File, packageName, fileName string, parents []string, message *descriptorpb.DescriptorProto) {
+func (r *Registry) analyseMessage(
+	fileData *data.File,
+	packageName, fileName string,
+	parents []string,
+	message *descriptorpb.DescriptorProto,
+) {
 	packageIdentifier := r.getNameOfPackageLevelIdentifier(parents, message.GetName())
 
-	fqName := r.getFullQualifiedName(packageName, parents, message.GetName()) // "." + packageName + "." + parentsPrefix + message.GetName()
+	fqName := r.getFullQualifiedName(
+		packageName,
+		parents,
+		message.GetName(),
+	) // "." + packageName + "." + parentsPrefix + message.GetName()
 	protoType := descriptorpb.FieldDescriptorProto_TYPE_MESSAGE
 
 	typeInfo := &TypeInformation{
@@ -33,13 +42,19 @@ func (r *Registry) analyseMessage(fileData *data.File, packageName, fileName str
 				switch f.GetName() {
 				case "key":
 					typeInfo.KeyType = &data.MapEntryType{
-						Type:       r.getFieldType(f),
-						IsExternal: r.isExternalDependenciesOutsidePackage(f.GetTypeName(), packageName),
+						Type: r.getFieldType(f),
+						IsExternal: r.isExternalDependenciesOutsidePackage(
+							f.GetTypeName(),
+							packageName,
+						),
 					}
 				case "value":
 					typeInfo.ValueType = &data.MapEntryType{
-						Type:       r.getFieldType(f),
-						IsExternal: r.isExternalDependenciesOutsidePackage(f.GetTypeName(), packageName),
+						Type: r.getFieldType(f),
+						IsExternal: r.isExternalDependenciesOutsidePackage(
+							f.GetTypeName(),
+							packageName,
+						),
 					}
 				}
 

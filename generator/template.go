@@ -13,8 +13,8 @@ import (
 	"github.com/Masterminds/sprig"
 	"github.com/iancoleman/strcase"
 
-	"github.com/grpc-ecosystem/protoc-gen-grpc-gateway-ts/data"
-	"github.com/grpc-ecosystem/protoc-gen-grpc-gateway-ts/registry"
+	"github.com/aflesher/protoc-gen-grpc-gateway-ts/data"
+	"github.com/aflesher/protoc-gen-grpc-gateway-ts/registry"
 )
 
 const tmpl = `
@@ -489,7 +489,10 @@ func renderURL(r *registry.Registry) func(method data.Method) string {
 			if err != nil {
 				return methodURL
 			}
-			renderURLSearchParamsFn := fmt.Sprintf("${fm.renderURLSearchParams(req, %s)}", urlPathParams)
+			renderURLSearchParamsFn := fmt.Sprintf(
+				"${fm.renderURLSearchParams(req, %s)}",
+				urlPathParams,
+			)
 			// prepend "&" if query string is present otherwise prepend "?"
 			// trim leading "&" if present before prepending it
 			if parsedURL.RawQuery != "" {

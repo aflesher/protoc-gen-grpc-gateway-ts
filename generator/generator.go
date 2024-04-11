@@ -10,8 +10,8 @@ import (
 	plugin "github.com/golang/protobuf/protoc-gen-go/plugin"
 	log "github.com/sirupsen/logrus" // nolint: depguard
 
-	"github.com/grpc-ecosystem/protoc-gen-grpc-gateway-ts/data"
-	"github.com/grpc-ecosystem/protoc-gen-grpc-gateway-ts/registry"
+	"github.com/aflesher/protoc-gen-grpc-gateway-ts/data"
+	"github.com/aflesher/protoc-gen-grpc-gateway-ts/registry"
 	"github.com/pkg/errors"
 )
 
@@ -50,7 +50,9 @@ func New(paramsMap map[string]string) (*TypeScriptGRPCGatewayGenerator, error) {
 }
 
 // Generate take a code generator request and returns a response. it analyse request with registry and use the generated data to render ts files
-func (t *TypeScriptGRPCGatewayGenerator) Generate(req *plugin.CodeGeneratorRequest) (*plugin.CodeGeneratorResponse, error) {
+func (t *TypeScriptGRPCGatewayGenerator) Generate(
+	req *plugin.CodeGeneratorRequest,
+) (*plugin.CodeGeneratorResponse, error) {
 	resp := &plugin.CodeGeneratorResponse{}
 
 	filesData, err := t.Registry.Analyse(req)
@@ -75,7 +77,8 @@ func (t *TypeScriptGRPCGatewayGenerator) Generate(req *plugin.CodeGeneratorReque
 			return nil, errors.Wrap(err, "error generating file")
 		}
 		resp.File = append(resp.File, generated)
-		needToGenerateFetchModule = needToGenerateFetchModule || fileData.Services.NeedsFetchModule()
+		needToGenerateFetchModule = needToGenerateFetchModule ||
+			fileData.Services.NeedsFetchModule()
 	}
 
 	if needToGenerateFetchModule {
@@ -93,7 +96,10 @@ func (t *TypeScriptGRPCGatewayGenerator) Generate(req *plugin.CodeGeneratorReque
 	return resp, nil
 }
 
-func (t *TypeScriptGRPCGatewayGenerator) generateFile(fileData *data.File, tmpl *template.Template) (*plugin.CodeGeneratorResponse_File, error) {
+func (t *TypeScriptGRPCGatewayGenerator) generateFile(
+	fileData *data.File,
+	tmpl *template.Template,
+) (*plugin.CodeGeneratorResponse_File, error) {
 	w := bytes.NewBufferString("")
 
 	if fileData.IsEmpty() {
@@ -115,7 +121,9 @@ func (t *TypeScriptGRPCGatewayGenerator) generateFile(fileData *data.File, tmpl 
 	}, nil
 }
 
-func (t *TypeScriptGRPCGatewayGenerator) generateFetchModule(tmpl *template.Template) (*plugin.CodeGeneratorResponse_File, error) {
+func (t *TypeScriptGRPCGatewayGenerator) generateFetchModule(
+	tmpl *template.Template,
+) (*plugin.CodeGeneratorResponse_File, error) {
 	w := bytes.NewBufferString("")
 	fileName := filepath.Join(t.Registry.FetchModuleDirectory, t.Registry.FetchModuleFilename)
 	err := tmpl.Execute(w, &data.File{EnableStylingCheck: t.EnableStylingCheck})

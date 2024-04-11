@@ -6,9 +6,9 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/aflesher/protoc-gen-grpc-gateway-ts/data"
 	descriptorpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
 	plugin "github.com/golang/protobuf/protoc-gen-go/plugin"
-	"github.com/grpc-ecosystem/protoc-gen-grpc-gateway-ts/data"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus" // nolint: depguard
 )
@@ -96,7 +96,9 @@ func NewRegistry(paramsMap map[string]string) (*Registry, error) {
 	return r, nil
 }
 
-func getFetchModuleDirectory(paramsMap map[string]string) (fetchModuleDirectory string, fetchModuleFile string, err error) {
+func getFetchModuleDirectory(
+	paramsMap map[string]string,
+) (fetchModuleDirectory string, fetchModuleFile string, err error) {
 	fetchModuleDirectory, ok := paramsMap[FetchModuleDirectory]
 
 	if !ok {
@@ -128,7 +130,11 @@ func getTSImportRootInformation(paramsMap map[string]string) ([]string, []string
 		if !path.IsAbs(tsImportRoot) {
 			absPath, err := filepath.Abs(tsImportRoot)
 			if err != nil {
-				return nil, nil, errors.Wrapf(err, "error turning path %s into absolute path", tsImportRoot)
+				return nil, nil, errors.Wrapf(
+					err,
+					"error turning path %s into absolute path",
+					tsImportRoot,
+				)
 			}
 
 			tsImportRoot = absPath
@@ -210,7 +216,10 @@ func (r *Registry) Analyse(req *plugin.CodeGeneratorRequest) (map[string]*data.F
 	// collect all the external dependencies and back fill it to the file data.
 	err := r.collectExternalDependenciesFromData(data)
 	if err != nil {
-		return nil, errors.Wrap(err, "error collecting external dependency information after analysis finished")
+		return nil, errors.Wrap(
+			err,
+			"error collecting external dependency information after analysis finished",
+		)
 	}
 
 	return data, nil
@@ -243,7 +252,9 @@ func (r *Registry) isExternalDependenciesOutsidePackage(fqTypeName, packageName 
 }
 
 // findRootAliasForPath iterate through all ts_import_roots and try to find an alias with the first matching the ts_import_root
-func (r *Registry) findRootAliasForPath(predicate func(root string) (bool, error)) (foundAtRoot, alias string, err error) {
+func (r *Registry) findRootAliasForPath(
+	predicate func(root string) (bool, error),
+) (foundAtRoot, alias string, err error) {
 	foundAtRoot = ""
 	alias = ""
 	for i, root := range r.TSImportRoots {

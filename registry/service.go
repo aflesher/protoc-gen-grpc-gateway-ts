@@ -7,7 +7,7 @@ import (
 	"google.golang.org/genproto/googleapis/api/annotations"
 	"google.golang.org/protobuf/proto"
 
-	"github.com/grpc-ecosystem/protoc-gen-grpc-gateway-ts/data"
+	"github.com/aflesher/protoc-gen-grpc-gateway-ts/data"
 )
 
 func getHTTPAnnotation(m *descriptorpb.MethodDescriptorProto) *annotations.HttpRule {
@@ -58,7 +58,12 @@ func getHTTPBody(m *descriptorpb.MethodDescriptorProto) *string {
 	}
 }
 
-func (r *Registry) analyseService(fileData *data.File, packageName string, fileName string, service *descriptorpb.ServiceDescriptorProto) {
+func (r *Registry) analyseService(
+	fileData *data.File,
+	packageName string,
+	fileName string,
+	service *descriptorpb.ServiceDescriptorProto,
+) {
 	packageIdentifier := service.GetName()
 	fqName := "." + packageName + "." + packageIdentifier
 
@@ -85,14 +90,23 @@ func (r *Registry) analyseService(fileData *data.File, packageName string, fileN
 		isInputTypeExternal := r.isExternalDependenciesOutsidePackage(inputTypeFQName, packageName)
 
 		if isInputTypeExternal {
-			fileData.ExternalDependingTypes = append(fileData.ExternalDependingTypes, inputTypeFQName)
+			fileData.ExternalDependingTypes = append(
+				fileData.ExternalDependingTypes,
+				inputTypeFQName,
+			)
 		}
 
 		outputTypeFQName := *method.OutputType
-		isOutputTypeExternal := r.isExternalDependenciesOutsidePackage(outputTypeFQName, packageName)
+		isOutputTypeExternal := r.isExternalDependenciesOutsidePackage(
+			outputTypeFQName,
+			packageName,
+		)
 
 		if isOutputTypeExternal {
-			fileData.ExternalDependingTypes = append(fileData.ExternalDependingTypes, outputTypeFQName)
+			fileData.ExternalDependingTypes = append(
+				fileData.ExternalDependingTypes,
+				outputTypeFQName,
+			)
 		}
 
 		httpMethod := "POST"
