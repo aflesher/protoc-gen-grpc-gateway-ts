@@ -34,10 +34,10 @@ const tmpl = `
 {{define "messages"}}{{range .}}
 {{- if .HasOneOfFields}}
 export type {{.Name}} = {
-  {{- range .Fields}}
-    {{fieldName .Name}}?: {{tsType .}}
-  {{- end}}
-  }
+{{- range .Fields}}
+  {{fieldName .Name}}?: {{tsType .}}
+{{- end}}
+}
 {{- else -}}
 export type {{.Name}} = {
 {{- range .Fields}}
@@ -70,16 +70,6 @@ export type {{.Name}} = {
 * This file is a generated Typescript file for GRPC Gateway, DO NOT MODIFY
 */
 {{if .Dependencies}}{{- include "dependencies" .StableDependencies -}}{{end}}
-{{- if .NeedsOneOfSupport}}
-type Absent<T, K extends keyof T> = { [k in Exclude<keyof T, K>]?: undefined };
-type OneOf<T> =
-  | { [k in keyof T]?: undefined }
-  | (
-    keyof T extends infer K ?
-      (K extends string & keyof T ? { [k in K]: T[K] } & Absent<T, K>
-        : never)
-    : never);
-{{end}}
 {{- if .Enums}}{{include "enums" .Enums}}{{end}}
 {{- if .Messages}}{{include "messages" .Messages}}{{end}}
 {{- if .Services}}{{include "services" .Services}}{{end}}
