@@ -38,7 +38,6 @@ export type {{.Name}} = {
     {{fieldName .Name}}?: {{tsType .}}
   {{- end}}
   }
-{{end}}
 {{- else -}}
 export type {{.Name}} = {
 {{- range .Fields}}
