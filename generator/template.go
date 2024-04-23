@@ -33,19 +33,16 @@ const tmpl = `
 
 {{define "messages"}}{{range .}}
 {{- if .HasOneOfFields}}
-type Base{{.Name}} = {
-{{- range .NonOneOfFields}}
-  {{fieldName .Name}}?: {{tsType .}}
-{{- end}}
-}
-
-export type {{.Name}} = Base{{.Name}}
-{{range $groupId, $fields := .OneOfFieldsGroups}}  & OneOf<{ {{range $index, $field := $fields}}{{fieldName $field.Name}}: {{tsType $field}}{{if (lt (add $index 1) (len $fields))}}; {{end}}{{end}} }>
+export type {{.Name}} = {
+  {{- range .Fields}}
+    {{fieldName .Name}}?: {{tsType .}}
+  {{- end}}
+  }
 {{end}}
 {{- else -}}
 export type {{.Name}} = {
 {{- range .Fields}}
-  {{fieldName .Name}}?: {{tsType .}}
+  {{fieldName .Name}}: {{tsType .}}
 {{- end}}
 }
 {{end}}
@@ -566,7 +563,7 @@ func tsType(r *registry.Registry, fieldType data.Type) string {
 func mapScalaType(protoType string) string {
 	switch protoType {
 	case "uint64", "sint64", "int64", "fixed64", "sfixed64":
-		return "bigint"
+		return "number"
 	case "string":
 		return "string"
 	case "float", "double", "int32", "sint32", "uint32", "fixed32", "sfixed32":
