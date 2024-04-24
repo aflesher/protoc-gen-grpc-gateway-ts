@@ -32,19 +32,15 @@ const tmpl = `
 {{end}}{{end}}
 
 {{define "messages"}}{{range .}}
-{{- if .HasOneOfFields}}
 export type {{.Name}} = {
 {{- range .Fields}}
+  {{- if .IsOneOfField}}
   {{fieldName .Name}}?: {{tsType .}}
-{{- end}}
-}
-{{- else -}}
-export type {{.Name}} = {
-{{- range .Fields}}
+  {{- else }}
   {{fieldName .Name}}: {{tsType .}}
+  {{- end}}
 {{- end}}
 }
-{{end}}
 {{end}}{{end}}
 
 {{define "services"}}{{range .}}export class {{.Name}} {
