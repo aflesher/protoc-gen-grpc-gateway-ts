@@ -32,23 +32,15 @@ const tmpl = `
 {{end}}{{end}}
 
 {{define "messages"}}{{range .}}
-{{- if .HasOneOfFields}}
-type Base{{.Name}} = {
-{{- range .NonOneOfFields}}
-  {{fieldName .Name}}?: {{tsType .}}
-{{- end}}
-}
-
-export type {{.Name}} = Base{{.Name}}
-{{range $groupId, $fields := .OneOfFieldsGroups}}  & OneOf<{ {{range $index, $field := $fields}}{{fieldName $field.Name}}: {{tsType $field}}{{if (lt (add $index 1) (len $fields))}}; {{end}}{{end}} }>
-{{end}}
-{{- else -}}
 export type {{.Name}} = {
 {{- range .Fields}}
+  {{- if .IsOneOfField}}
   {{fieldName .Name}}?: {{tsType .}}
+  {{- else }}
+  {{fieldName .Name}}: {{tsType .}}
+  {{- end}}
 {{- end}}
 }
-{{end}}
 {{end}}{{end}}
 
 {{define "services"}}{{range .}}export class {{.Name}} {
@@ -74,16 +66,6 @@ export type {{.Name}} = {
 * This file is a generated Typescript file for GRPC Gateway, DO NOT MODIFY
 */
 {{if .Dependencies}}{{- include "dependencies" .StableDependencies -}}{{end}}
-{{- if .NeedsOneOfSupport}}
-type Absent<T, K extends keyof T> = { [k in Exclude<keyof T, K>]?: undefined };
-type OneOf<T> =
-  | { [k in keyof T]?: undefined }
-  | (
-    keyof T extends infer K ?
-      (K extends string & keyof T ? { [k in K]: T[K] } & Absent<T, K>
-        : never)
-    : never);
-{{end}}
 {{- if .Enums}}{{include "enums" .Enums}}{{end}}
 {{- if .Messages}}{{include "messages" .Messages}}{{end}}
 {{- if .Services}}{{include "services" .Services}}{{end}}
@@ -565,7 +547,9 @@ func tsType(r *registry.Registry, fieldType data.Type) string {
 
 func mapScalaType(protoType string) string {
 	switch protoType {
-	case "uint64", "sint64", "int64", "fixed64", "sfixed64", "string":
+	case "uint64", "sint64", "int64", "fixed64", "sfixed64":
+		return "number"
+	case "string":
 		return "string"
 	case "float", "double", "int32", "sint32", "uint32", "fixed32", "sfixed32":
 		return "number"
